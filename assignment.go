@@ -29,8 +29,8 @@ func init() {
 }
 
 func (s *Spec) Assignment(v, t string) bool {
-	V := s.MustGetType(v)
-	T := s.MustGetType(t)
+	V := s.MustGetValidType(v)
+	T := s.MustGetValidType(t)
 
 	x := &operand{mode: value, typ: V}
 	_assignment(s.checker, x, T, "")

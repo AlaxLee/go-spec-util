@@ -23,17 +23,18 @@ type Spec struct {
 
 func NewSpec(code string) *Spec {
 	s := new(Spec)
-	addPackageHead(&code)
+	addPackageHeadToCode(&code)
+	packageName := mustGetPackageNameFromCode(code)
 	s.code = code
 
 	var err error
 	fset := token.NewFileSet()
-	s.file, err = parser.ParseFile(fset, "example.go", code, 0)
+	s.file, err = parser.ParseFile(fset, packageName+".go", code, 0)
 	if err != nil {
 		log.Panicf("parse code failed: %s", err)
 	}
 	c := new(types.Config)
-	s.pkg = types.NewPackage("example", "")
+	s.pkg = types.NewPackage(packageName, "")
 	s.checker = types.NewChecker(c, fset, s.pkg, nil)
 
 	// 此方法会触发一次 go/types.(*Checker).assignment 方法，以保证在 runtime.firstmoduledata 中能查到它
@@ -48,6 +49,14 @@ func (s *Spec) GetTypeObject(v string) types.Object {
 	return s.pkg.Scope().Lookup(v)
 }
 
+func (s *Spec) MustGetValidTypeObject(v string) types.Object {
+	o := s.GetTypeObject(v)
+	if o == nil {
+		panic("find <" + v + "> in code <" + s.code + "> failed")
+	}
+	return o
+}
+
 func (s *Spec) GetType(v string) types.Type {
 	o := s.GetTypeObject(v)
 	if o == nil {
@@ -57,7 +66,7 @@ func (s *Spec) GetType(v string) types.Type {
 	}
 }
 
-func (s *Spec) MustGetType(v string) types.Type {
+func (s *Spec) MustGetValidType(v string) types.Type {
 	o := s.GetTypeObject(v)
 	if o == nil {
 		panic("find <" + v + "> in code <" + s.code + "> failed")
@@ -70,6 +79,11 @@ func GetTypeObject(code, v string) types.Object {
 	return s.GetTypeObject(v)
 }
 
+func MustGetValidTypeObject(code, v string) types.Object {
+	s := NewSpec(code)
+	return s.MustGetValidTypeObject(v)
+}
+
 func GetType(code, v string) types.Type {
 	s := NewSpec(code)
 	return s.GetType(v)
@@ -77,5 +91,5 @@ func GetType(code, v string) types.Type {
 
 func MustGetType(code, v string) types.Type {
 	s := NewSpec(code)
-	return s.MustGetType(v)
+	return s.MustGetValidType(v)
 }
