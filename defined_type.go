@@ -32,12 +32,3 @@ func IsDefinedType(a ...interface{}) bool {
 	}
 	return true
 }
-
-// isNamed must be kept in sync with isNamed in src/go/types/predicates.go
-func isNamed(typ types.Type) bool {
-	if _, ok := typ.(*types.Basic); ok {
-		return ok
-	}
-	_, ok := typ.(*types.Named)
-	return ok
-}
