@@ -34,6 +34,7 @@ func NewSpec(code string) *Spec {
 		log.Panicf("parse code failed: %s", err)
 	}
 	c := new(types.Config)
+	c.Error = func(err error) {} // 防止触发 go/types.(*Checker).err 方法里的 panic
 	s.pkg = types.NewPackage(packageName, "")
 	s.checker = types.NewChecker(c, fset, s.pkg, nil)
 
@@ -46,6 +47,7 @@ func NewSpec(code string) *Spec {
 }
 
 func (s *Spec) GetTypeObject(v string) types.Object {
+	//return lookupByBFS(s.pkg.Scope(), v)
 	return s.pkg.Scope().Lookup(v)
 }
 
@@ -74,6 +76,31 @@ func (s *Spec) MustGetValidType(v string) types.Type {
 	return o.Type()
 }
 
+func (s *Spec) GetUnderlyingType(v string) types.Type {
+	t := s.GetType(v)
+	if t == nil {
+		return nil
+	}
+	return t.Underlying()
+}
+
+func (s *Spec) GetBaseType(v string) types.Type {
+	t := s.GetType(v)
+	if t == nil {
+		return nil
+	}
+	p, isPointer := t.(*types.Pointer)
+	if !isPointer {
+		return nil
+	}
+	return p.Elem()
+}
+
+func (s *Spec) IsDefinedType(v string) bool {
+	t := s.GetType(v)
+	return isNamed(t)
+}
+
 func GetTypeObject(code, v string) types.Object {
 	s := NewSpec(code)
 	return s.GetTypeObject(v)
@@ -92,4 +119,63 @@ func GetType(code, v string) types.Type {
 func MustGetType(code, v string) types.Type {
 	s := NewSpec(code)
 	return s.MustGetValidType(v)
+}
+
+func GetUnderlyingType(code, v string) types.Type {
+	s := NewSpec(code)
+	return s.GetUnderlyingType(v)
+}
+
+func GetBaseType(code, v string) types.Type {
+	s := NewSpec(code)
+	return s.GetBaseType(v)
+}
+
+//IsDefinedType(t types.Type) bool
+//or
+//IsDefinedType(code,v string) bool
+func IsDefinedType(a ...interface{}) bool {
+	switch len(a) {
+	case 1:
+		t, ok := a[0].(types.Type)
+		if !ok {
+			panic("arg must be a types.Type")
+		}
+		return isNamed(t)
+	case 2:
+		code, ok1 := a[0].(string)
+		v, ok2 := a[1].(string)
+		if !ok1 || !ok2 {
+			panic("args must all string")
+
+		}
+		s := NewSpec(code)
+		return s.IsDefinedType(v)
+	default:
+		panic("unexpect")
+	}
+	return true
+}
+
+func lookupByBFS(scope *types.Scope, v string) types.Object {
+	o := scope.Lookup(v)
+	if o != nil {
+		return o
+	}
+	for i := 0; i < scope.NumChildren(); i++ {
+		o = lookupByBFS(scope.Child(i), v)
+		if o != nil {
+			return o
+		}
+	}
+	return nil
+}
+
+// isNamed must be kept in sync with isNamed in src/go/types/predicates.go
+func isNamed(typ types.Type) bool {
+	if _, ok := typ.(*types.Basic); ok {
+		return ok
+	}
+	_, ok := typ.(*types.Named)
+	return ok
 }

@@ -1,10 +1,10 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/AlaxLee/go-spec-util)](https://goreportcard.com/report/github.com/AlaxLee/go-spec-util)
 
 # go-spec-util
-学习 go spec 过程中的一些工具
+some tools on learning go spec
 
-# identity
-判断两个类型是否相等
+# [identity](https://golang.google.cn/ref/spec#Type_identity) 
+judge two types if identical
 ```go
 // type A1 = B  则 A1 与 B 类型相同
 
