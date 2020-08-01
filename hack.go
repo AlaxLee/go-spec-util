@@ -62,9 +62,54 @@ func isNamed(typ types.Type) bool {
 	return ok
 }
 
+func IsBoolean(typ types.Type) bool {
+	t, ok := typ.Underlying().(*types.Basic)
+	return ok && t.Info()&types.IsBoolean != 0
+}
+
+func IsInteger(typ types.Type) bool {
+	t, ok := typ.Underlying().(*types.Basic)
+	return ok && t.Info()&types.IsInteger != 0
+}
+
+func IsUnsigned(typ types.Type) bool {
+	t, ok := typ.Underlying().(*types.Basic)
+	return ok && t.Info()&types.IsUnsigned != 0
+}
+
+func IsFloat(typ types.Type) bool {
+	t, ok := typ.Underlying().(*types.Basic)
+	return ok && t.Info()&types.IsFloat != 0
+}
+
+func IsComplex(typ types.Type) bool {
+	t, ok := typ.Underlying().(*types.Basic)
+	return ok && t.Info()&types.IsComplex != 0
+}
+
+func IsNumeric(typ types.Type) bool {
+	t, ok := typ.Underlying().(*types.Basic)
+	return ok && t.Info()&types.IsNumeric != 0
+}
+
+func IsString(typ types.Type) bool {
+	t, ok := typ.Underlying().(*types.Basic)
+	return ok && t.Info()&types.IsString != 0
+}
+
+func IsTyped(typ types.Type) bool {
+	t, ok := typ.Underlying().(*types.Basic)
+	return !ok || t.Info()&types.IsUntyped == 0
+}
+
 func IsUntyped(typ types.Type) bool {
 	t, ok := typ.Underlying().(*types.Basic)
 	return ok && t.Info()&types.IsUntyped != 0
+}
+
+func IsOrdered(typ types.Type) bool {
+	t, ok := typ.Underlying().(*types.Basic)
+	return ok && t.Info()&types.IsOrdered != 0
 }
 
 func IsConstType(typ types.Type) bool {

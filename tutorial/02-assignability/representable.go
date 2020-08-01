@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	//representableExample01()
+	representableExample01()
 	representableExample02()
 }
 
