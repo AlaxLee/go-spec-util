@@ -76,7 +76,7 @@ type V struct{}
 func (v V) m() {}
 var x V
 `)
-	if _, ok := gospec.IsInterface(s.GetType("T")); ok {
+	if _, ok := gospec.ToInterface(s.GetType("T")); ok {
 		fmt.Println("T is an interface type")
 	}
 	if s.Implements("x", "T") {
@@ -104,11 +104,11 @@ var x = make(chan int)
 `)
 	V := s.GetType("x")
 	T := s.GetType("T")
-	vc, ok := gospec.IsChan(V)
+	vc, ok := gospec.ToChan(V)
 	if ok && vc.Dir() == types.SendRecv {
 		fmt.Println("x is a bidirectional channel value")
 	}
-	tc, ok := gospec.IsChan(T)
+	tc, ok := gospec.ToChan(T)
 	if ok {
 		fmt.Println("T is a channel type")
 	}
@@ -145,27 +145,27 @@ func assignExample05() {
 	typeNames := []string{"pointer", "function", "slice", "map", "channel", "interface"}
 	typeMap := map[string]typeInfo{
 		"pointer": {"type T *int", func(t types.Type) bool {
-			_, ok := gospec.IsPointer(t)
+			_, ok := gospec.ToPointer(t)
 			return ok
 		}},
 		"function": {"type T func()", func(t types.Type) bool {
-			_, ok := gospec.IsFunction(t)
+			_, ok := gospec.ToFunction(t)
 			return ok
 		}},
 		"slice": {"type T []string", func(t types.Type) bool {
-			_, ok := gospec.IsSlice(t)
+			_, ok := gospec.ToSlice(t)
 			return ok
 		}},
 		"map": {"type T map[string]int", func(t types.Type) bool {
-			_, ok := gospec.IsMap(t)
+			_, ok := gospec.ToMap(t)
 			return ok
 		}},
 		"channel": {"type T chan int", func(t types.Type) bool {
-			_, ok := gospec.IsChan(t)
+			_, ok := gospec.ToChan(t)
 			return ok
 		}},
 		"interface": {"type T interface{}", func(t types.Type) bool {
-			_, ok := gospec.IsInterface(t)
+			_, ok := gospec.ToInterface(t)
 			return ok
 		}},
 	}

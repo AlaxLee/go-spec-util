@@ -20,7 +20,7 @@ func mustGetPackageNameFromCode(code string) string {
 }
 
 //check types.Type if be a basic, pointer, function, slice, map, channel, or interface
-func IsPointer(t types.Type) (*types.Pointer, bool) {
+func ToPointer(t types.Type) (*types.Pointer, bool) {
 	if t == nil {
 		return nil, false
 	}
@@ -29,7 +29,7 @@ func IsPointer(t types.Type) (*types.Pointer, bool) {
 	return tp, ok
 }
 
-func IsFunction(t types.Type) (*types.Signature, bool) {
+func ToFunction(t types.Type) (*types.Signature, bool) {
 	if t == nil {
 		return nil, false
 	}
@@ -38,7 +38,7 @@ func IsFunction(t types.Type) (*types.Signature, bool) {
 	return tf, ok
 }
 
-func IsSlice(t types.Type) (*types.Slice, bool) {
+func ToSlice(t types.Type) (*types.Slice, bool) {
 	if t == nil {
 		return nil, false
 	}
@@ -47,7 +47,7 @@ func IsSlice(t types.Type) (*types.Slice, bool) {
 	return ts, ok
 }
 
-func IsMap(t types.Type) (*types.Map, bool) {
+func ToMap(t types.Type) (*types.Map, bool) {
 	if t == nil {
 		return nil, false
 	}
@@ -56,7 +56,7 @@ func IsMap(t types.Type) (*types.Map, bool) {
 	return tm, ok
 }
 
-func IsInterface(t types.Type) (*types.Interface, bool) {
+func ToInterface(t types.Type) (*types.Interface, bool) {
 	if t == nil {
 		return nil, false
 	}
@@ -65,7 +65,7 @@ func IsInterface(t types.Type) (*types.Interface, bool) {
 	return ti, ok
 }
 
-func IsChan(t types.Type) (*types.Chan, bool) {
+func ToChan(t types.Type) (*types.Chan, bool) {
 	if t == nil {
 		return nil, false
 	}
@@ -74,11 +74,55 @@ func IsChan(t types.Type) (*types.Chan, bool) {
 	return tc, ok
 }
 
-func IsBasic(t types.Type) (*types.Basic, bool) {
+func ToBasic(t types.Type) (*types.Basic, bool) {
 	if t == nil {
 		return nil, false
 	}
 	tu := t.Underlying()
 	tb, ok := tu.(*types.Basic)
 	return tb, ok
+}
+
+//check types.Object if be a const
+func ToConstObject(o types.Object) (*types.Const, bool) {
+	if o == nil {
+		return nil, false
+	}
+	constObj, ok := o.(*types.Const)
+	return constObj, ok
+}
+
+func IsConstObject(o types.Object) bool {
+	_, isConstObject := ToConstObject(o)
+	return isConstObject
+}
+
+func IsByte(t types.Type) bool {
+	if t == nil {
+		return false
+	}
+	tu := t.Underlying()
+	tb, ok := tu.(*types.Basic)
+	if !ok {
+		return false
+	}
+	if tb.Kind() != types.Byte {
+		return false
+	}
+	return true
+}
+
+func IsRune(t types.Type) bool {
+	if t == nil {
+		return false
+	}
+	tu := t.Underlying()
+	tb, ok := tu.(*types.Basic)
+	if !ok {
+		return false
+	}
+	if tb.Kind() != types.Rune {
+		return false
+	}
+	return true
 }

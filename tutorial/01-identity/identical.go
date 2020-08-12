@@ -1,10 +1,16 @@
 package main
 
 import (
+	"fmt"
 	gospec "github.com/AlaxLee/go-spec-util"
 )
 
 func main() {
+	identicalExample01()
+	identicalExample02()
+}
+
+func identicalExample01() {
 	var s *gospec.Spec
 
 	//1. type A1 = B  则 A1 与 B 类型相同
@@ -244,5 +250,32 @@ var a382 chan<- B`,
 	a391   的类型是 byte
 	a392   的类型是 byte
 	他们类型 相同
+	*/
+}
+
+func identicalExample02() {
+	s := gospec.NewSpec(`
+type U = struct {
+	Name    string
+	Address *struct {
+		Street string
+		City   string
+	}
+}
+
+type V = struct {
+	Name    string ` + "`" + `json:"name"` + "`" + `
+	Address *struct {
+		Street string ` + "`" + `json:"street"` + "`" + `
+		City   string ` + "`" + `json:"city"` + "`" + `
+	} ` + "`" + `json:"address"` + "`" + `
+}
+`)
+
+	if s.IdenticalIgnoreTags("U", "V") {
+		fmt.Println("they IdenticalIgnoreTags")
+	}
+	/* the output is:
+	they IdenticalIgnoreTags
 	*/
 }

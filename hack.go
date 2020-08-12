@@ -15,6 +15,9 @@ var _assignment func(checker *types.Checker, x *operand, T types.Type, context s
 //must same as method (*Checker).representable in src/go/types/expr.go
 var _representable func(checker *types.Checker, x *operand, typ *types.Basic)
 
+//must same as method (*Checker).conversion in src/go/types/conversions.go
+var _conversion func(checker *types.Checker, x *operand, T types.Type)
+
 func init() {
 	if runtime.Version() != "go1.14" {
 		log.Println("warning: version is not go1.14, may be panic in usring")
@@ -24,6 +27,8 @@ func init() {
 	// 如果查找不到，会报错：panic: Invalid function name: go/types.(*Checker).assignment
 	// 先触发一次 go/types.(*Checker).representable 方法，以保证在 runtime.firstmoduledata 中能查到它
 	// 如果查找不到，会报错：panic: Invalid function name: go/types.(*Checker).representable
+	// 先触发一次 go/types.(*Checker).conversion 方法，以保证在 runtime.firstmoduledata 中能查到它
+	// 如果查找不到，会报错：panic: Invalid function name: go/types.(*Checker).conversion
 	NewSpec("")
 
 	// 将 _assignment 映射为 go/types.(*Checker).assignment
@@ -34,6 +39,12 @@ func init() {
 
 	// 将 _representable 映射为 go/types.(*Checker).representable
 	err = forceexport.GetFunc(&_representable, "go/types.(*Checker).representable")
+	if err != nil {
+		panic(err)
+	}
+
+	// 将 _conversion 映射为 go/types.(*Checker).conversion
+	err = forceexport.GetFunc(&_conversion, "go/types.(*Checker).conversion")
 	if err != nil {
 		panic(err)
 	}

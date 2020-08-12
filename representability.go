@@ -13,7 +13,7 @@ func (s *Spec) Representable(v, t string) bool {
 
 	x := &operand{mode: constant_, typ: vo.Type(), val: vc.Val()}
 
-	tb, ok := IsBasic(T)
+	tb, ok := ToBasic(T)
 	if !ok {
 		return false
 	}

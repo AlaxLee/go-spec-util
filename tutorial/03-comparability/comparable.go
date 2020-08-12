@@ -139,7 +139,7 @@ func comparableExample06() {
 var a *int
 `)
 	ta := s.GetType("a")
-	if _, isPointer := gospec.IsPointer(ta); isPointer && gospec.Comparable(ta) {
+	if _, isPointer := gospec.ToPointer(ta); isPointer && gospec.Comparable(ta) {
 		fmt.Println("Pointer values are comparable.")
 	}
 	var a *int
@@ -163,7 +163,7 @@ func comparableExample07() {
 var a chan int
 `)
 	ta := s.GetType("a")
-	if _, isChan := gospec.IsChan(ta); isChan && gospec.Comparable(ta) {
+	if _, isChan := gospec.ToChan(ta); isChan && gospec.Comparable(ta) {
 		fmt.Println("Channel values are comparable.")
 	}
 	var a chan int
@@ -187,7 +187,7 @@ func comparableExample08() {
 	var a interface{}
 `)
 	ta := s.GetType("a")
-	if _, isInterface := gospec.IsInterface(ta); isInterface && gospec.Comparable(ta) {
+	if _, isInterface := gospec.ToInterface(ta); isInterface && gospec.Comparable(ta) {
 		fmt.Println("Interface values are comparable.")
 	}
 
