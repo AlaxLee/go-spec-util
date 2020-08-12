@@ -1,7 +1,6 @@
 package gospec
 
 import (
-	"fmt"
 	"go/types"
 )
 
@@ -51,27 +50,6 @@ func Identical(a ...interface{}) bool {
 	}
 
 	return true
-}
-
-func (s *Spec) OutputIfIdentical(v, t string) {
-	vo := s.MustGetValidTypeObject(v)
-	to := s.MustGetValidTypeObject(t)
-	FormatIfIdentical(vo, to)
-}
-
-func OutputIfIdentical(code, v, t string) {
-	s := NewSpec(code)
-	s.OutputIfIdentical(v, t)
-}
-
-func FormatIfIdentical(v, t types.Object) {
-	result := fmt.Sprintf("%-6s 的类型是 %-10s\n%-6s 的类型是 %-10s\n他们类型 ", v.Name(), v.Type(), t.Name(), t.Type())
-	if Identical(v, t) {
-		result += "相同"
-	} else {
-		result += "不同"
-	}
-	fmt.Println(result)
 }
 
 func (s *Spec) IdenticalIgnoreTags(v, t string) bool {
