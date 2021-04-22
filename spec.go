@@ -2,6 +2,7 @@ package gospec
 
 import (
 	"go/ast"
+	"go/importer"
 	"go/parser"
 	"go/token"
 	"go/types"
@@ -16,10 +17,11 @@ var spec *Spec
 
 type SearchKind int
 
+// src/go/types/scope.go Scope has 4 level：Universe、Package、File、Local
 const (
-	OnlyPackage = iota
-	PackageAndUniverse
-	All
+	SearchOnlyPackage = iota
+	SearchPackageAndUniverse
+	SearchAll
 )
 
 type Spec struct {
@@ -43,10 +45,11 @@ func NewSpec(code string) *Spec {
 		log.Panicf("parse code failed: %s", err)
 	}
 	c := new(types.Config)
-	c.Error = func(err error) {} // 防止触发 go/types.(*Checker).err 方法里的 panic
+	c.Error = func(err error) {}    // 防止触发 go/types.(*Checker).err 方法里的 panic
+	c.Importer = importer.Default() // 增加golang包导入，使之可以识别 import 的包
 	s.pkg = types.NewPackage(packageName, "")
 	s.checker = types.NewChecker(c, fset, s.pkg, nil)
-	s.SearchKind = PackageAndUniverse // default search in universe and pkg scope
+	s.SearchKind = SearchPackageAndUniverse // default search in universe and pkg scope
 
 	// 此方法会触发一次 go/types.(*Checker).assignment 方法，以保证在 runtime.firstmoduledata 中能查到它
 	// 此方法会触发一次 go/types.(*Checker).representable 方法，以保证在 runtime.firstmoduledata 中能查到它
@@ -59,15 +62,15 @@ func NewSpec(code string) *Spec {
 
 func (s *Spec) GetTypeObject(v string) types.Object {
 	switch s.SearchKind {
-	case OnlyPackage:
+	case SearchOnlyPackage:
 		return s.pkg.Scope().Lookup(v)
-	case PackageAndUniverse:
+	case SearchPackageAndUniverse:
 		o := s.pkg.Scope().Lookup(v)
 		if o == nil {
 			o = types.Universe.Lookup(v)
 		}
 		return o
-	case All:
+	case SearchAll:
 		o := lookupByBFS(s.pkg.Scope(), v)
 		if o == nil {
 			o = types.Universe.Lookup(v)
@@ -126,13 +129,13 @@ func (s *Spec) GetBaseType(v string) types.Type {
 
 func (s *Spec) IsInUniverse(v string) bool {
 	switch s.SearchKind {
-	case OnlyPackage, PackageAndUniverse:
+	case SearchOnlyPackage, SearchPackageAndUniverse:
 		if s.pkg.Scope().Lookup(v) == nil {
 			if types.Universe.Lookup(v) != nil {
 				return true
 			}
 		}
-	case All:
+	case SearchAll:
 		if lookupByBFS(s.pkg.Scope(), v) == nil {
 			if types.Universe.Lookup(v) != nil {
 				return true
@@ -142,36 +145,6 @@ func (s *Spec) IsInUniverse(v string) bool {
 		panic("unexpect")
 	}
 	return false
-}
-
-func GetTypeObject(code, v string) types.Object {
-	s := NewSpec(code)
-	return s.GetTypeObject(v)
-}
-
-func MustGetValidTypeObject(code, v string) types.Object {
-	s := NewSpec(code)
-	return s.MustGetValidTypeObject(v)
-}
-
-func GetType(code, v string) types.Type {
-	s := NewSpec(code)
-	return s.GetType(v)
-}
-
-func MustGetType(code, v string) types.Type {
-	s := NewSpec(code)
-	return s.MustGetValidType(v)
-}
-
-func GetUnderlyingType(code, v string) types.Type {
-	s := NewSpec(code)
-	return s.GetUnderlyingType(v)
-}
-
-func GetBaseType(code, v string) types.Type {
-	s := NewSpec(code)
-	return s.GetBaseType(v)
 }
 
 func lookupByBFS(scope *types.Scope, v string) types.Object {

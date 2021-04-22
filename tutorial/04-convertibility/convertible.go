@@ -11,6 +11,7 @@ func main() {
 	convertibleExample02()
 }
 
+// 显示转换
 func convertibleExample01() {
 	/* Converting a constant yields a typed constant as result.
 	uint(iota)               // iota value of type uint
@@ -84,6 +85,7 @@ func convertibleExample01() {
 	*/
 }
 
+// 显示转换
 func convertibleExample02() {
 	// A non-constant value x can be converted to type T in any of these cases:
 	fmt.Println("A non-constant value x can be converted to type T in any of these cases:")
