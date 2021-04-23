@@ -1,5 +1,4 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/AlaxLee/go-spec-util)](https://goreportcard.com/report/github.com/AlaxLee/go-spec-util)
-[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/569/badge)](https://bestpractices.coreinfrastructure.org/projects/569)
 
 # go-spec-util
 some tools on learning go spec
