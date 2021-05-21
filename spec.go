@@ -51,8 +51,6 @@ func NewSpec(code string) *Spec {
 	s.checker = types.NewChecker(c, fset, s.pkg, nil)
 	s.SearchKind = SearchPackageAndUniverse // default search in universe and pkg scope
 
-	// 此方法会触发一次 go/types.(*Checker).assignment 方法，以保证在 runtime.firstmoduledata 中能查到它
-	// 此方法会触发一次 go/types.(*Checker).representable 方法，以保证在 runtime.firstmoduledata 中能查到它
 	err = s.checker.Files([]*ast.File{s.file})
 	if err != nil {
 		log.Panicf("check file failed: %s", err)

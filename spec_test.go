@@ -237,7 +237,7 @@ func main() {
 }`
 	s := NewSpec(code)
 	s.SearchKind = SearchAll
-	fmt.Println(s.GetBaseType("b"))
+	//fmt.Println(s.GetBaseType("b"))
 	if s.GetBaseType("a") == nil && s.GetBaseType("b").String() == "int" {
 	} else {
 		t.Error(`test failed`)
